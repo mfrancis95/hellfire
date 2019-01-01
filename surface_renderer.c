@@ -1,8 +1,8 @@
 #include "renderer.h"
 #include "software_renderer.h"
 
-static const unsigned int height = 480;
-static const unsigned int width = 640;
+static const unsigned height = 480;
+static const unsigned width = 640;
 
 static unsigned *indices;
 static SDL_Surface *surface;
