@@ -16,15 +16,18 @@ void cleanupRenderer(void) {
 
 void initRenderer(void) {
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, width, height);
+    texture = SDL_CreateTexture(
+        renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, width,
+        height
+    );
     indices = calloc(width * height, sizeof(unsigned));
-    for (int x = 0; x < width; x++) {
+    for (unsigned x = 0; x < width; x++) {
         indices[x + width * (height - 1)] = 36;
     }
 }
 
 void render(void) {
-    unsigned pitch;
+    int pitch;
     unsigned *pixels;
     SDL_LockTexture(texture, NULL, (void **) &pixels, &pitch);
     renderPixels(indices, pixels, width, height);

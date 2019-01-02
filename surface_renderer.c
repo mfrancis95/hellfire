@@ -13,9 +13,11 @@ void cleanupRenderer(void) {
 }
 
 void initRenderer(void) {
-    surface = SDL_CreateRGBSurface(0, width, height, 32, 0xFF0000, 0x00FF00, 0x0000FF, 0);
+    surface = SDL_CreateRGBSurfaceWithFormat(
+        0, width, height, 24, SDL_PIXELFORMAT_RGB888
+    );
     indices = calloc(width * height, sizeof(unsigned));
-    for (int x = 0; x < width; x++) {
+    for (unsigned x = 0; x < width; x++) {
         indices[x + width * (height - 1)] = 36;
     }
 }

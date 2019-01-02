@@ -1,4 +1,9 @@
+#include <limits.h>
 #include <stdbool.h>
+#ifdef TIMED
+#include <stdio.h>
+#include <time.h>
+#endif
 #include "renderer.h"
 
 const unsigned palette[37] = {
@@ -43,23 +48,47 @@ const unsigned palette[37] = {
 
 SDL_Window *window;
 
-int main() {
-    window = SDL_CreateWindow("Hellfire", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 960, 0);
+int main(int argc, char *argv[]) {
+    window = SDL_CreateWindow(
+        "Hellfire", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 960,
+        SDL_WINDOW_OPENGL
+    );
     initRenderer();
+    unsigned long maxRenders = argc > 1 ? atol(argv[1]) : ULONG_MAX;
+    unsigned long renders = 0;
+    #ifdef TIMED
+    unsigned long nanoseconds = 0;
+    struct timespec start, end;
+    #endif
     SDL_Event event;
     bool quit = false;
-    while (!quit) {
+    while (!quit && renders < maxRenders) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 quit = true;
                 break;
             }
         }
+        #ifdef TIMED
+        clock_gettime(CLOCK_MONOTONIC, &start);
+        #endif
         render();
+        #ifdef TIMED
+        clock_gettime(CLOCK_MONOTONIC, &end);
+        if (start.tv_nsec < end.tv_nsec) {
+            nanoseconds += end.tv_nsec - start.tv_nsec;
+            renders++;
+        }
+        #else
+        renders++;
+        #endif
         SDL_Delay(16);
     }
     cleanupRenderer();
     SDL_DestroyWindow(window);
     SDL_Quit();
+    #ifdef TIMED
+    printf("%lu\n", nanoseconds / renders / 1000000);
+    #endif
     return 0;
 }
