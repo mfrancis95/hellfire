@@ -1,3 +1,15 @@
-extern const unsigned palette[37];
+#include "renderer.h"
 
-void renderPixels(unsigned *indices, unsigned *pixels, unsigned width, unsigned height);
+struct SoftwareRenderer : Renderer {
+
+    virtual ~SoftwareRenderer();
+
+protected:
+
+    unsigned *indices;
+
+    SoftwareRenderer();
+
+    void renderPixels(unsigned *pixels);
+
+};

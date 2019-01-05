@@ -1,9 +1,14 @@
 #include <SDL2/SDL.h>
 
+extern const unsigned height, palette[37], width;
+
 extern SDL_Window *window;
 
-void cleanupRenderer(void);
+struct Renderer {
 
-void initRenderer(void);
+    virtual ~Renderer() = default;
+    virtual void render() = 0;
 
-void render(void);
+};
+
+Renderer *getRenderer();

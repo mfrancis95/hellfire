@@ -3,14 +3,14 @@ all: surface_renderer texture_renderer
 clean:
 	rm -f *.o surface_renderer texture_renderer
 
-hellfire.o: hellfire.c renderer.h
-	gcc -c $(FLAGS) hellfire.c
+hellfire.o: hellfire.cpp renderer.h
+	g++ -c $(FLAGS) hellfire.cpp
 
-software_renderer.o: software_renderer.c software_renderer.h
-	gcc -c $(FLAGS) software_renderer.c
+software_renderer.o: renderer.h software_renderer.cpp software_renderer.h
+	g++ -c $(FLAGS) software_renderer.cpp
 
-surface_renderer: hellfire.o software_renderer.o surface_renderer.c
-	gcc $(FLAGS) -o surface_renderer hellfire.o software_renderer.o surface_renderer.c -lSDL2
+surface_renderer: hellfire.o software_renderer.o surface_renderer.cpp
+	g++ $(FLAGS) -o surface_renderer hellfire.o software_renderer.o surface_renderer.cpp -lSDL2
 
-texture_renderer: hellfire.o software_renderer.o texture_renderer.c
-	gcc $(FLAGS) -o texture_renderer hellfire.o software_renderer.o texture_renderer.c -lSDL2
+texture_renderer: hellfire.o software_renderer.o texture_renderer.cpp
+	g++ $(FLAGS) -o texture_renderer hellfire.o software_renderer.o texture_renderer.cpp -lSDL2
