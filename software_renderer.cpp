@@ -5,15 +5,17 @@ SoftwareRenderer::~SoftwareRenderer() {
     delete [] indices;
 }
 
-SoftwareRenderer::SoftwareRenderer() : indices(new unsigned[width * height]{}) {
-    for (unsigned x = 0; x < width; x++) {
-        indices[x + width * (height - 1)] = 36;
+SoftwareRenderer::SoftwareRenderer(
+    SDL_Window *window, unsigned width, unsigned height
+) : Renderer{window, width, height}, indices(new unsigned[width * height]{}) {
+    for (auto x = 0U; x < width; x++) {
+        indices[x + width * (height - 1)] = PALETTE_SIZE - 1;
     }
 }
 
 void SoftwareRenderer::renderPixels(unsigned *pixels) {
-    for (unsigned x = 0; x < width; x++) {
-        for (unsigned y = 1; y < height; y++) {
+    for (auto x = 0U; x < width; x++) {
+        for (auto y = 1U; y < height; y++) {
             auto src = x + y * width;
             auto index = indices[src];
             if (index) {

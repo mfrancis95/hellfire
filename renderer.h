@@ -1,14 +1,21 @@
 #include <SDL2/SDL.h>
 
-extern const unsigned height, palette[37], width;
-
-extern SDL_Window *window;
+#define PALETTE_SIZE 37
 
 struct Renderer {
+
+    const unsigned *palette;
 
     virtual ~Renderer() = default;
     virtual void render() = 0;
 
+protected:
+
+    unsigned height, width;
+    SDL_Window *window;
+
+    Renderer(SDL_Window *window, const unsigned width, const unsigned height);
+
 };
 
-Renderer *getRenderer();
+Renderer *createRenderer(SDL_Window *window, const unsigned width, const unsigned height);

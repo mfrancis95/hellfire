@@ -6,10 +6,13 @@ struct SoftwareRenderer : Renderer {
 
 protected:
 
-    unsigned *indices;
-
-    SoftwareRenderer();
-
+    SoftwareRenderer(
+        SDL_Window *window, const unsigned width, const unsigned height
+    );
     void renderPixels(unsigned *pixels);
+
+private:
+
+    unsigned *indices;
 
 };

@@ -22,7 +22,9 @@ private:
     SDL_Renderer *renderer;
     SDL_Texture *texture;
 
-    TextureRenderer() : SoftwareRenderer{} {
+    TextureRenderer(
+        SDL_Window *window, const unsigned width, const unsigned height
+    ) : SoftwareRenderer{window, width, height} {
         renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
         texture = SDL_CreateTexture(
             renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING,
@@ -30,10 +32,14 @@ private:
         );
     }
 
-    friend Renderer *getRenderer();
+    friend Renderer *createRenderer(
+        SDL_Window *window, const unsigned width, const unsigned height
+    );
 
 };
 
-Renderer *getRenderer() {
-    return new TextureRenderer;
+Renderer *createRenderer(
+    SDL_Window *window, const unsigned width, const unsigned height
+) {
+    return new TextureRenderer{window, width, height};
 }

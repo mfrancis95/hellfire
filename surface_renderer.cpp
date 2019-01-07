@@ -16,16 +16,22 @@ private:
 
     SDL_Surface *surface;
 
-    SurfaceRenderer() : SoftwareRenderer{} {
+    SurfaceRenderer(
+        SDL_Window *window, const unsigned width, const unsigned height
+    ) : SoftwareRenderer{window, width, height} {
         surface = SDL_CreateRGBSurfaceWithFormat(
             0, width, height, 24, SDL_PIXELFORMAT_RGB888
         );
     }
 
-    friend Renderer *getRenderer();
+    friend Renderer *createRenderer(
+        SDL_Window *window, const unsigned width, const unsigned height
+    );
 
 };
 
-Renderer *getRenderer() {
-    return new SurfaceRenderer;
+Renderer *createRenderer(
+    SDL_Window *window, const unsigned width, const unsigned height
+) {
+    return new SurfaceRenderer{window, width, height};
 }
