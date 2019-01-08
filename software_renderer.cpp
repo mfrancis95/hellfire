@@ -6,7 +6,7 @@ SoftwareRenderer::~SoftwareRenderer() {
 }
 
 SoftwareRenderer::SoftwareRenderer(
-    SDL_Window *window, unsigned width, unsigned height
+    SDL_Window *window, const unsigned width, const unsigned height
 ) : Renderer{window, width, height}, indices(new unsigned[width * height]{}) {
     for (auto x = 0U; x < width; x++) {
         indices[x + width * (height - 1)] = PALETTE_SIZE - 1;
