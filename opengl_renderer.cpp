@@ -1,19 +1,16 @@
 #define GL_GLEXT_PROTOTYPES
 
-#include <cstdlib>
-#include <cstdio>
+#include <fstream>
 #include <GL/gl.h>
 #include "software_renderer.h"
 
-static char *readFile(const char *file) {
-    auto f = fopen(file, "rb");
-    fseek(f, 0, SEEK_END);
-    auto length = ftell(f);
-    fseek(f, 0, SEEK_SET);
+static const char *readFile(const char *file) {
+    std::ifstream stream{file, std::ios::ate};
+    std::streamoff length = stream.tellg();
+    stream.seekg(0, std::ios::beg);
     auto data = new char[length + 1];
-    fread(data, 1, length, f);
+    stream.read(data, length);
     data[length] = '\0';
-    fclose(f);
     return data;
 }
 
@@ -39,7 +36,10 @@ struct OpenGLRenderer : SoftwareRenderer {
     }
 
     void render() {
-        renderPixels(pixels);
+        renderPixels(static_cast<unsigned *>(glMapBuffer(
+            GL_TEXTURE_BUFFER, GL_WRITE_ONLY
+        )));
+        glUnmapBuffer(GL_TEXTURE_BUFFER);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         SDL_GL_SwapWindow(window);
     }
@@ -49,20 +49,19 @@ private:
     GLuint buffers[2], fragmentShader, program, texture, vertexArray,
         vertexShader;
     SDL_GLContext context;
-    unsigned *pixels;
 
     OpenGLRenderer(
         SDL_Window *window, const unsigned width, const unsigned height
     ) : SoftwareRenderer{window, width, height} {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 4);
         context = SDL_GL_CreateContext(window);
         glFrontFace(GL_CW);
         glGenVertexArrays(1, &vertexArray);
         glBindVertexArray(vertexArray);
         glGenBuffers(2, buffers);
         glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-        GLfloat positionData[8] = {
+        GLbyte positionData[8] = {
             -1, -1,
             -1, 1,
             1, -1,
@@ -72,7 +71,7 @@ private:
             GL_ARRAY_BUFFER, sizeof(positionData), positionData, GL_STATIC_DRAW
         );
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+        glVertexAttribPointer(0, 2, GL_BYTE, GL_FALSE, 0, nullptr);
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_BUFFER, texture);
         glBindBuffer(GL_TEXTURE_BUFFER, buffers[1]);
@@ -80,7 +79,6 @@ private:
             GL_TEXTURE_BUFFER, width * height * sizeof(unsigned), nullptr,
             GL_CLIENT_STORAGE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT
         );
-        pixels = (unsigned *) glMapBuffer(GL_TEXTURE_BUFFER, GL_WRITE_ONLY);
         glTexBuffer(GL_TEXTURE_BUFFER, GL_R32UI, buffers[1]);
         glAttachShader(
             program = glCreateProgram(),

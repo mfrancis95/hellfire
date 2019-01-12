@@ -1,11 +1,11 @@
-#include <climits>
 #ifdef TIMED
 #include <ctime>
 #include <iostream>
 #endif
+#include <limits>
 #include "renderer.h"
 
-#define NUM_PALETTES 9
+#define NUM_PALETTES 10
 
 static unsigned palettes[NUM_PALETTES][PALETTE_SIZE] = {
     {
@@ -16,8 +16,13 @@ static unsigned palettes[NUM_PALETTES][PALETTE_SIZE] = {
         0xBFA727, 0xBFAF2F, 0xB7AF2F, 0xB7B72F, 0xB7B737, 0xCFCF6F, 0xDFDF9F,
         0xEFEFC7, 0xFFFFFF
     }
-};
-static unsigned paletteIndex;
+}, paletteIndex;
+
+static unsigned toGreyscale(unsigned pixel) {
+    double ratio = static_cast<double>(pixel) / 0xFFFFFF;
+    unsigned component = static_cast<unsigned>(ratio * 0xFF);
+    return (component << 16) | (component << 8) | component;
+}
 
 int main(int argc, char *argv[]) {
     for (auto i = 1; i < PALETTE_SIZE; i++) {
@@ -29,6 +34,7 @@ int main(int argc, char *argv[]) {
         palettes[6][i] = palettes[0][i] ^ 0xFF00FF;
         palettes[7][i] = palettes[0][i] ^ 0xFFFF;
         palettes[8][i] = palettes[0][i] ^ 0xFF;
+        palettes[9][i] = toGreyscale(palettes[0][i]);
     }
     auto window = SDL_CreateWindow(
         "Hellfire", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 960,
@@ -36,13 +42,14 @@ int main(int argc, char *argv[]) {
     );
     Renderer *renderer = createRenderer(window, 640, 480);
     renderer->palette = palettes[0];
-    auto maxRenders = argc > 1 ? atol(argv[1]) : ULONG_MAX, renders = 0UL;
+    auto maxRenders = argc > 1 ? atol(argv[1]) : std::numeric_limits<unsigned long>::max(),
+        renders = 0UL;
     #ifdef TIMED
     auto nanoseconds = 0UL;
     struct timespec start, end;
     #endif
     SDL_Event event;
-    auto quit = false;
+    auto extinguish = false, quit = false;
     while (!quit && renders < maxRenders) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_KEYDOWN) {
@@ -58,6 +65,16 @@ int main(int argc, char *argv[]) {
                         paletteIndex = 0;
                     }
                     renderer->palette = palettes[paletteIndex];
+                }
+                else if (state[SDL_SCANCODE_SPACE]) {
+                    if (extinguish) {
+                        extinguish = false;
+                        renderer->reset();
+                    }
+                    else {
+                        extinguish = true;
+                        renderer->extinguish();
+                    }
                 }
             }
             else if (event.type == SDL_QUIT) {

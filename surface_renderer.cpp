@@ -7,7 +7,7 @@ struct SurfaceRenderer : SoftwareRenderer {
     }
 
     void render() {
-        renderPixels((unsigned *) surface->pixels);
+        renderPixels(static_cast<unsigned *>(surface->pixels));
         SDL_BlitScaled(surface, nullptr, SDL_GetWindowSurface(window), nullptr);
         SDL_UpdateWindowSurface(window);
     }

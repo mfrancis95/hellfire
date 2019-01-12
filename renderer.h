@@ -7,7 +7,9 @@ struct Renderer {
     const unsigned *palette;
 
     virtual ~Renderer() = default;
+    virtual void extinguish() = 0;
     virtual void render() = 0;
+    virtual void reset() = 0;
 
 protected:
 

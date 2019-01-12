@@ -9,9 +9,9 @@ struct TextureRenderer : SoftwareRenderer {
 
     void render() {
         int pitch;
-        unsigned *pixels;
-        SDL_LockTexture(texture, nullptr, (void **) &pixels, &pitch);
-        renderPixels(pixels);
+        void *pixels;
+        SDL_LockTexture(texture, nullptr, &pixels, &pitch);
+        renderPixels(static_cast<unsigned *>(pixels));
         SDL_UnlockTexture(texture);
         SDL_RenderCopy(renderer, texture, nullptr, nullptr);
         SDL_RenderPresent(renderer);

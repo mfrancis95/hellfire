@@ -1,4 +1,4 @@
-#version 420
+#version 440
 
 layout(origin_upper_left) in vec4 gl_FragCoord;
 

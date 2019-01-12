@@ -1,8 +1,11 @@
+#include <random>
 #include "renderer.h"
 
 struct SoftwareRenderer : Renderer {
 
     virtual ~SoftwareRenderer();
+    void extinguish();
+    void reset();
 
 protected:
 
@@ -13,6 +16,9 @@ protected:
 
 private:
 
+    std::uniform_int_distribution<unsigned> distribution;
+    bool extinguishing;
+    std::default_random_engine generator;
     unsigned *indices;
 
 };
